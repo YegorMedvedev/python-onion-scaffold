@@ -3,34 +3,39 @@ FROM python:3.8.2-alpine as base
 
 # Use multi-stage build in order to minimize the final image size
 # This builder was added in order to install psycopg2-binary, otherwise it doesn't build with alpine image
-FROM base as builder
+FROM base as setup
 
-RUN mkdir -p /usr/install
-RUN apk update \
-    && apk add postgresql-dev gcc python3-dev musl-dev
-RUN pip3 install pipenv
+RUN mkdir -p /usr/local/app && \
+    apk update && \
+    apk add postgresql-dev gcc python3-dev musl-dev && \
+    pip3 install -U pipenv --no-cache-dir
 
-WORKDIR /usr/install
+WORKDIR /usr/local/app
 
 COPY ./Pipfile .
 COPY ./Pipfile.lock .
 
-RUN pipenv install --system --deploy
+RUN pipenv install --system --deploy && \
+    pip3 uninstall -y pipenv virtualenv-clone virtualenv
 
 
 # Create workind directory and copy only nessesary files there
-FROM base
+FROM setup as builder
 
-COPY --from=builder /usr/install /usr/local/app
-WORKDIR /usr/local/app
+RUN mkdir -p /config && \
+    mkdir -p /src && \
+    mkdir -p /alembic
 
-RUN mkdir /config
+COPY ./src ./src
+COPY ./alembic ./alembic
+COPY ./alembic.ini ./
 
-COPY ./src .
-COPY ./alembic .
-COPY ./alembic.ini .
+ENV PYTHONPATH "/usr/local/app:/usr/local/app/src"
+ENV PYTHONUNBUFFERED "1"
 
 
 # Final steps... expose port and execute the script
+FROM builder
+
 EXPOSE $PORT
-CMD ["python", "./src/app.py"]
+CMD ["python3", "/usr/local/app/src/app.py"]

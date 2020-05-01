@@ -10,5 +10,6 @@ setup(
     license='',
     author='YegorMedvedev',
     author_email='social.neet@gmail.com',
-    description=''
+    description='',
+    install_requires=['pipenv']
 )
