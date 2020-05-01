@@ -24,8 +24,8 @@ The following command will build and run an image:
 $ docker build -t python-onion-scaffold:latest .
 $ docker run \
     --name=python-onion-scaffold \
+    --volume=$(pwd)/config/.env:/usr/src/app/config/.env \
     -d \
-    -v ./config/:/usr/src/app/config/ \
     python-onion-scaffold:latest 
 ```
 
