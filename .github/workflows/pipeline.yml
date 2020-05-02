@@ -28,6 +28,18 @@ jobs:
     needs: compile
     env:
       ENV: test
+      NAME: python-onion-scaffold
+      POSTGRESQL_URL: postgresql://postgres:postgres@localhost:5432/postgres
+    services:
+      postgres:
+        image: postgres:12
+        env:
+          POSTGRES_PASSWORD: postgres
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     steps:
       - uses: actions/checkout@v2
       - name: Set up Python 3.8
@@ -43,4 +55,5 @@ jobs:
           pipenv install --dev --system
       - name: Run tests
         run: |
+          alembic upgrade head
           nosetests -v
