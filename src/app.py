@@ -20,13 +20,13 @@ def before_all():
 def init_application():
     app.register_blueprint(application_routes.http)
     app.register_error_handler(Exception, error_handler)
+
+
+def start_application():
     app.run(port=get_port())
 
 
-def create_app():
+if __name__ == '__main__':
     before_all()
     init_application()
-
-
-if __name__ == '__main__':
-    create_app()
+    start_application()

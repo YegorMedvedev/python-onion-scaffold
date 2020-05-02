@@ -4,7 +4,7 @@ import uuid
 
 import mock
 
-from core.domain_entity_interfaces import ApplicationHealth, AlembicVersion
+from src.core.domain_entity_interfaces import ApplicationHealth, AlembicVersion
 from src.services.application_services import get_application_health
 from src.version import __version__
 
